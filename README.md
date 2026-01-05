@@ -206,7 +206,7 @@ baba-is-agi/
 │   ├── demo_agent.py     # Greedy pathfinding agent
 │   └── claude_code_agent.py # Claude API agent
 ├── scripts/              # Utility scripts
-├── tests/                # Comprehensive test suite (102 tests)
+├── tests/                # Comprehensive test suite (98 tests)
 ├── docs/                 # Documentation
 └── pixi.toml            # Dependency management
 ```

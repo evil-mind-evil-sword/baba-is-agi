@@ -12,7 +12,7 @@ Following the main CLAUDE.md philosophy of "LEAN AND CLEAN", tests should:
 
 ## Test Suite Overview
 
-The test suite contains **102 tests** across 11 test files, validating all aspects of the game engine.
+The test suite contains **98 tests** across 11 test files (6 xfailed for known engine limitations).
 
 ## Core Test Files
 
