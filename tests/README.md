@@ -1,6 +1,6 @@
 # Baba Is AGI Tests
 
-Comprehensive test suite with 77+ test cases.
+Comprehensive test suite with 98 test cases (6 xfailed for known engine limitations).
 
 ## Running Tests
 

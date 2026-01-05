@@ -131,33 +131,6 @@ tests/
 └── ...
 ```
 
-## Recent Cleanup (2024)
-
-### ✅ Codebase Cleanup Completed
-
-1. **Organized Test Suite**
-   - Moved all test scripts from root to `tests/` directory
-   - Created comprehensive pytest suite with 77+ test cases
-   - Added test categories: grid, rules, mechanics, environments, edge cases, integration
-   - Removed duplicate test files
-
-2. **Cleaned Scripts Directory**
-   - Removed 10+ duplicate visualization scripts
-   - Consolidated into single `visualize_level.py`
-   - Removed debug and analysis scripts
-   - Fixed sys.path usage (against CLAUDE.md guidelines)
-
-3. **Fixed Code Issues**
-   - Added missing `Property` import in `utils.py`
-   - Fixed `play_game.py` to not use sys.path manipulation
-   - Moved documentation files to `docs/` directory
-
-4. **Followed CLAUDE.md Philosophy**
-   - Removed backwards compatibility code
-   - Eliminated defensive programming patterns
-   - Deleted unused/duplicate functionality
-   - Kept codebase minimal and focused
-
 ## Testing Commands
 
 ```bash
@@ -175,9 +148,6 @@ pixi run test-integration # Slower integration tests
 pixi run test-verbose
 ```
 
-## Known Issues
+## Known Limitations
 
-1. Text object naming convention might be inconsistent (investigating)
-2. Some special objects (cursor, empty) might need special handling
-3. Rule creation with new objects needs fixing
-4. Need to verify all properties are properly defined in Property enum
+See README.md "Known Limitations" section for current engine bugs affecting evaluation.

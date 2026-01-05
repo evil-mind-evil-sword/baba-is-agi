@@ -51,7 +51,7 @@ This project uses **Pixi** for environment and dependency management. Pixi ensur
 **Initial Setup:**
 ```bash
 pixi install               # Install dependencies
-pixi run install-dev       # Install package in editable mode
+pixi run install           # Install package in editable mode
 ```
 
 **Available Pixi Tasks:**
