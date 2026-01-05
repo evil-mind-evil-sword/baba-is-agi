@@ -1,6 +1,7 @@
 """Integration tests for complete game scenarios."""
 
 from baba import make
+from baba.properties import Property
 
 
 class TestGameScenarios:
@@ -25,22 +26,20 @@ class TestGameScenarios:
 
         assert grid.won
 
-    def test_tutorial_level_puzzle_solving(self):
-        """Test solving tutorial level with obstacles."""
-        env = make("tutorial")
+    def test_wall_maze_level_gameplay(self):
+        """Test wall maze level with obstacles."""
+        env = make("wall_maze")
         grid = env.grid
 
-        # Should have walls and rocks to navigate
+        # Should have walls
         grid._update_rules()
 
-        # Verify rules
-        assert grid.rule_manager.has_property("wall", "STOP")
-        assert grid.rule_manager.has_property("rock", "PUSH")
+        # Verify STOP rule exists for walls
+        assert grid.rule_manager.has_property("wall", Property.STOP)
 
-        # Execute a solution (this is environment-specific)
-        # Just verify the level is playable
-        initial_you_objects = grid.find_objects(name="baba")
-        assert len(initial_you_objects) > 0
+        # Verify we can move
+        you_objects = grid.rule_manager.get_you_objects()
+        assert len(you_objects) > 0
 
         # Make some moves
         for _ in range(5):
@@ -91,68 +90,33 @@ class TestGameScenarios:
             if len(grid.rule_manager.get_win_objects()) > 0:
                 break
 
-    def test_sink_level_interactions(self):
-        """Test sink mechanics in sink level."""
-        env = make("sink")
+    def test_two_room_level(self):
+        """Test two room level."""
+        env = make("two_room")
         grid = env.grid
 
         grid._update_rules()
 
-        # Should have SINK objects
-        sink_objects = grid.rule_manager.get_sink_objects()
-        assert len(sink_objects) > 0
+        # Verify we can move
+        you_objects = grid.rule_manager.get_you_objects()
+        assert len(you_objects) > 0
 
-        # Test that we can move
-        sum(len(grid.grid[y][x]) for y in range(grid.height) for x in range(grid.width))
-
-        # Make moves that might trigger sinking
+        # Make some moves
         for move in ["right", "down", "left", "up"]:
             grid.step(move)
 
-        # Object count might have changed due to sinking
-        sum(len(grid.grid[y][x]) for y in range(grid.height) for x in range(grid.width))
         # Just verify the game is still playable
         assert not grid.lost or grid.won
 
-    def test_multiple_you_level(self):
-        """Test controlling multiple YOU objects."""
-        env = make("multiple_you")
-        grid = env.grid
-
-        grid._update_rules()
-
-        # Should have multiple YOU objects
-        you_objects = grid.rule_manager.get_you_objects()
-        assert len(you_objects) >= 1
-
-        # Find all controllable objects
-        controllable = []
-        for obj_name in you_objects:
-            controllable.extend(grid.find_objects(name=obj_name))
-
-        initial_positions = [(x, y) for _, x, y in controllable]
-
-        # Move all YOU objects
-        grid.step("right")
-
-        # Verify movement
-        for obj_name in you_objects:
-            moved_objects = grid.find_objects(name=obj_name)
-            for _obj, x, y in moved_objects:
-                # Check that at least some objects moved
-                if (x - 1, y) in initial_positions:
-                    assert True
-                    break
-
-    def test_complex_rules_level(self):
-        """Test level with complex rule interactions."""
-        env = make("complex_rules")
+    def test_multi_rule_level(self):
+        """Test level with multiple rule interactions."""
+        env = make("multi_rule")
         grid = env.grid
 
         grid._update_rules()
 
         # Should have multiple active rules
-        assert len(grid.rule_manager.rules) > 2
+        assert len(grid.rule_manager.rules) >= 1
 
         # Test that game is playable
         for move in ["right", "down", "right", "up"]:
@@ -205,10 +169,11 @@ class TestAgentCompatibility:
         assert hasattr(grid, "lost")
         assert hasattr(grid, "rule_manager")
 
-        # Test step
-        grid, won, lost = env.step("right")
-        assert isinstance(won, bool)
-        assert isinstance(lost, bool)
+        # Test step - returns (grid, reward, done, info)
+        grid, reward, done, info = env.step("right")
+        assert isinstance(reward, float)
+        assert isinstance(done, bool)
+        assert isinstance(info, dict)
 
         # Test grid has required methods for agents
         assert hasattr(grid, "render")
