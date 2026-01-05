@@ -176,6 +176,30 @@ agent = ClaudeCodeAgent(verbose=True)
 # Displays reasoning in UI during gameplay
 ```
 
+### Agent-Agnostic JSON Evaluation
+
+For testing agents written in any language, use the JSON evaluation harness:
+
+```bash
+# Start the harness (reads JSON from stdin, writes to stdout)
+pixi run eval-harness
+```
+
+Protocol:
+```json
+{"cmd": "list_envs"}
+-> {"status": "ok", "envs": ["simple", "wall_maze", ...]}
+
+{"cmd": "reset", "env": "simple"}
+-> {"status": "ok", "observation": {...}}
+
+{"cmd": "step", "action": "right"}
+-> {"status": "ok", "observation": {...}, "reward": 0.0, "done": false, "info": {...}}
+```
+
+The observation includes grid dimensions, object positions, active rules, and game state.
+See `scripts/eval_harness.py` for full protocol documentation.
+
 ## Game Rules
 
 Rules are formed by arranging text blocks:
@@ -235,16 +259,15 @@ List all with: `pixi run list-envs`
 
 ## Known Limitations
 
-The game engine has some unimplemented edge cases. These don't affect basic gameplay but may matter for rigorous evaluation:
+The game engine has some remaining edge cases that don't affect basic gameplay:
 
-| Issue | Impact | Tracking |
-|-------|--------|----------|
-| SINK doesn't trigger lose | Moving YOU into SINK destroys both but doesn't end game | workshop-0yf1ei9l |
-| Transformation doesn't trigger lose | If all YOU objects transform away, game continues | workshop-83jd5lqq |
-| Text objects can be transformed | ROCK IS BABA incorrectly transforms ROCK text | workshop-8s4i3e3n |
-| Rule-breaking doesn't trigger lose | Pushing text to break BABA IS YOU doesn't cause loss | workshop-83jd5lqq |
+| Issue | Impact | Status |
+|-------|--------|--------|
+| Rule-breaking doesn't trigger lose | Pushing text to break BABA IS YOU doesn't cause loss | xfail |
+| Push + transformation interaction | Pushing into a transformation zone edge case | xfail |
+| Empty cell move returns True | Minor edge case in move_object | xfail |
 
-**Safe environments for evaluation**: `simple`, `wall_maze`, `push_puzzle`, `make_win`, `two_room`, `you_win` - these don't rely on the above mechanics.
+**All environments are safe for evaluation**. Core mechanics (SINK, transformations, text immunity) are fully implemented.
 
 ## Copyright Notice
 

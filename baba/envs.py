@@ -27,9 +27,14 @@ class Environment:
     - Fixed dimensions
     - Initial object placement
     - Starting rules (formed by text objects)
+    - Difficulty rating (1-5)
 
     Subclasses implement setup() to create specific puzzles.
     """
+
+    # Difficulty rating (1-5): 1=trivial, 2=easy, 3=medium, 4=hard, 5=expert
+    # Subclasses should override this
+    difficulty: int = 1
 
     def __init__(self, width: int, height: int, name: str = "Custom"):
         """
@@ -140,6 +145,21 @@ class Environment:
         """Get the current state."""
         return self.grid.get_state()
 
+    def to_dict(self) -> dict:
+        """
+        Get JSON-serializable representation of current state.
+
+        Returns:
+            Dictionary containing grid state (see Grid.to_dict())
+            plus environment metadata (name, difficulty)
+        """
+        result = self.grid.to_dict()
+        result["env"] = {
+            "name": self.name,
+            "difficulty": self.difficulty,
+        }
+        return result
+
 
 # Basic Environments
 
@@ -152,6 +172,8 @@ class SimpleEnvironment(Environment):
     Layout: Baba on left, flag on right, with rules at top.
     Goal: Move Baba to the flag.
     """
+
+    difficulty = 1  # Trivial: just walk to the flag
 
     def __init__(self):
         super().__init__(10, 10, "Simple")
@@ -194,6 +216,8 @@ class SimpleEnvironment(Environment):
 
 class WallMazeEnvironment(Environment):
     """Environment with walls forming a maze."""
+
+    difficulty = 2  # Easy: navigate around walls
 
     def __init__(self):
         super().__init__(12, 12, "Wall Maze")
@@ -263,6 +287,8 @@ class WallMazeEnvironment(Environment):
 
 class PushPuzzleEnvironment(Environment):
     """Environment focused on pushing mechanics."""
+
+    difficulty = 2  # Easy: push rocks out of the way
 
     def __init__(self):
         super().__init__(10, 8, "Push Puzzle")
@@ -338,6 +364,8 @@ class PushPuzzleEnvironment(Environment):
 class TransformationEnvironment(Environment):
     """Environment showcasing object transformation."""
 
+    difficulty = 2  # Easy: understand transformation rules
+
     def __init__(self):
         super().__init__(10, 10, "Transformation")
 
@@ -409,6 +437,8 @@ class TransformationEnvironment(Environment):
 class YouWinEnvironment(Environment):
     """Simple environment where agent just needs to reach the win object."""
 
+    difficulty = 1  # Trivial: just reach the flag
+
     def __init__(self):
         super().__init__(6, 6, "YouWin")
 
@@ -462,6 +492,8 @@ class YouWinEnvironment(Environment):
 
 class MakeWinEnvironment(Environment):
     """Environment where agent needs to create a win rule before winning."""
+
+    difficulty = 3  # Medium: push text to create WIN rule
 
     def __init__(self):
         super().__init__(8, 8, "MakeWin")
@@ -521,6 +553,8 @@ class MakeWinEnvironment(Environment):
 
 class TwoRoomEnvironment(Environment):
     """Two-room environment with a dividing wall."""
+
+    difficulty = 2  # Easy: navigate through door
 
     def __init__(self):
         super().__init__(13, 9, "TwoRoom")
@@ -586,6 +620,8 @@ class TwoRoomEnvironment(Environment):
 class TwoRoomBreakStopEnvironment(Environment):
     """Two-room environment where you need to break WALL IS STOP to pass through."""
 
+    difficulty = 3  # Medium: break WALL IS STOP rule
+
     def __init__(self):
         super().__init__(13, 9, "TwoRoomBreakStop")
 
@@ -648,6 +684,8 @@ class TwoRoomBreakStopEnvironment(Environment):
 
 class MakeWinWithDistractorsEnvironment(Environment):
     """Make win environment with distractor objects and rules."""
+
+    difficulty = 3  # Medium: distractors add complexity
 
     def __init__(self):
         super().__init__(10, 10, "MakeWinDistr")
@@ -723,6 +761,8 @@ class MakeWinWithDistractorsEnvironment(Environment):
 class GotoWinWithColorEnvironment(Environment):
     """Environment with colored objects where specific color wins."""
 
+    difficulty = 2  # Easy: identify correct win target
+
     def __init__(self):
         super().__init__(8, 8, "GotoWinColor")
 
@@ -792,6 +832,8 @@ class GotoWinWithColorEnvironment(Environment):
 
 class MakeYouEnvironment(Environment):
     """Environment where you need to create a new YOU rule."""
+
+    difficulty = 4  # Hard: create new YOU rule
 
     def __init__(self):
         super().__init__(10, 10, "MakeYou")
@@ -866,6 +908,8 @@ class MakeYouEnvironment(Environment):
 
 class TransformPuzzleEnvironment(Environment):
     """Environment where you need to transform objects to win."""
+
+    difficulty = 3  # Medium: use transformations strategically
 
     def __init__(self):
         super().__init__(10, 10, "TransformPuzzle")
@@ -946,6 +990,8 @@ class TransformPuzzleEnvironment(Environment):
 
 class MultiRuleEnvironment(Environment):
     """Environment with multiple interacting rules."""
+
+    difficulty = 4  # Hard: manage multiple rule interactions
 
     def __init__(self):
         super().__init__(12, 10, "MultiRule")
@@ -1044,6 +1090,8 @@ class MultiRuleEnvironment(Environment):
 
 class RuleChainEnvironment(Environment):
     """Environment requiring a chain of rule manipulations."""
+
+    difficulty = 4  # Hard: chain multiple rule changes
 
     def __init__(self):
         super().__init__(11, 9, "RuleChain")

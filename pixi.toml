@@ -54,6 +54,9 @@ record-claude = "python scripts/record_claude_gameplay.py"
 record-demos = "python scripts/record_demo_gifs.py"
 viz-level = "python scripts/visualize_level.py"
 
+# Evaluation harness (agent-agnostic JSON API)
+eval-harness = "python scripts/eval_harness.py"
+
 
 [dependencies]
 python = ">=3.12"

@@ -76,6 +76,9 @@ pixi run sprite-showcase   # Show all available sprites
 pixi run example-agent     # Run example random agent
 pixi run custom-level      # Demo custom level creation
 
+# Evaluation (agent-agnostic JSON API)
+pixi run eval-harness      # Start JSON stdin/stdout harness
+
 # Code Quality
 pixi run lint              # Check code with Ruff linter
 pixi run lint-fix          # Auto-fix linting issues

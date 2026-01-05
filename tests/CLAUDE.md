@@ -12,7 +12,7 @@ Following the main CLAUDE.md philosophy of "LEAN AND CLEAN", tests should:
 
 ## Test Suite Overview
 
-The test suite contains **98 tests** across 11 test files (6 xfailed for known engine limitations).
+The test suite contains **101 tests** across 11 test files (3 xfailed for minor edge cases).
 
 ## Core Test Files
 

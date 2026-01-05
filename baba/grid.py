@@ -188,11 +188,17 @@ class Grid:
         # Apply transformations
         self._apply_transformations()
 
-        # Check win/lose conditions
+        # Check win condition BEFORE sinking (WIN takes priority over SINK)
         self._check_win_lose()
 
-        # Handle sinking
-        self._handle_sinking()
+        # If already won, skip sinking - WIN takes priority
+        if not self.won:
+            # Handle sinking
+            self._handle_sinking()
+
+            # Re-check lose condition after sinking
+            # This ensures we detect loss when all YOU objects are destroyed by SINK
+            self._check_win_lose()
 
         return self.won, self.lost
 
@@ -281,6 +287,9 @@ class Grid:
         for y in range(self.height):
             for x in range(self.width):
                 for obj in list(self.grid[y][x]):  # Copy to avoid modification during iteration
+                    # Text objects never transform - they form rules, not objects
+                    if obj.is_text:
+                        continue
                     transform_to = self.rule_manager.get_transformation(obj.name)
                     if transform_to:
                         # Find the target object type
@@ -300,14 +309,27 @@ class Grid:
         Check win/lose conditions.
 
         Win: Any YOU object overlaps with any WIN object
-        Lose: No objects have the YOU property
+        Lose: No instances of YOU objects exist on the grid
 
         Note: Once won/lost flags are set, they persist until reset.
         """
         you_objects = self.rule_manager.get_you_objects()
         win_objects = self.rule_manager.get_win_objects()
 
+        # Check if there are no object types with YOU property
         if not you_objects:
+            self.lost = True
+            return
+
+        # Check if there are any actual instances of YOU objects on the grid
+        # (The rule might say BABA IS YOU, but all babas could be destroyed)
+        has_you_instance = False
+        for you_name in you_objects:
+            if list(self.find_objects(name=you_name)):
+                has_you_instance = True
+                break
+
+        if not has_you_instance:
             self.lost = True
             return
 
@@ -434,3 +456,50 @@ class Grid:
         new_grid._update_rules()
 
         return new_grid
+
+    def to_dict(self) -> dict:
+        """
+        Serialize the grid state to a JSON-compatible dictionary.
+
+        This provides an agent-agnostic representation of the game state
+        that can be communicated via JSON to any external agent.
+
+        Returns:
+            Dictionary containing:
+            - dimensions: {width, height}
+            - objects: list of {name, type_id, x, y, is_text}
+            - rules: list of active rule strings
+            - properties: dict mapping object names to their properties
+            - state: {won, lost, steps}
+        """
+        objects = []
+        for y in range(self.height):
+            for x in range(self.width):
+                for obj in self.grid[y][x]:
+                    objects.append({
+                        "name": obj.name,
+                        "type_id": obj.type_id,
+                        "x": x,
+                        "y": y,
+                        "is_text": obj.is_text,
+                    })
+
+        rules = [str(rule) for rule in self.rule_manager.rules]
+
+        properties = {
+            name: [prop.value for prop in props]
+            for name, props in self.rule_manager.properties.items()
+        }
+
+        return {
+            "dimensions": {"width": self.width, "height": self.height},
+            "objects": objects,
+            "rules": rules,
+            "properties": properties,
+            "transformations": dict(self.rule_manager.transformations),
+            "state": {
+                "won": self.won,
+                "lost": self.lost,
+                "steps": self.steps,
+            },
+        }

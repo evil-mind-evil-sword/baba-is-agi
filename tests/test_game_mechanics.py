@@ -87,7 +87,6 @@ class TestWinLoseConditions:
         assert grid.lost
         assert not grid.won
 
-    @pytest.mark.xfail(reason="Transformation removing YOU doesn't trigger lose - see workshop-83jd5lqq")
     def test_transformation_can_cause_lose(self, game_setup):
         """Test that transformations can cause a lose condition."""
         grid, registry = game_setup
@@ -335,7 +334,6 @@ class TestObjectTransformations:
             assert len(objects) == 1
             assert list(objects)[0].name == "baba"
 
-    @pytest.mark.xfail(reason="Text objects are transformed when they shouldn't be - see workshop-8s4i3e3n")
     def test_text_not_transformed(self, transform_setup):
         """Test that text objects are not transformed."""
         grid, registry = transform_setup
@@ -357,7 +355,8 @@ class TestObjectTransformations:
         assert len(objects) == 1
         obj = list(objects)[0]
         assert obj.is_text
-        assert obj.name == "rock"
+        # Text objects have "_text" suffix in their name
+        assert obj.name == "rock_text"
 
 
 class TestSinkMechanics:
@@ -400,7 +399,6 @@ class TestSinkMechanics:
         # Both should be destroyed
         assert len(grid.get_objects_at(5, 5)) == 0
 
-    @pytest.mark.xfail(reason="SINK destroying YOU doesn't trigger lose - see workshop-0yf1ei9l")
     def test_moving_into_sink(self, sink_setup):
         """Test moving into SINK object destroys both."""
         grid, registry = sink_setup
