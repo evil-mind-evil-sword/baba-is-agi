@@ -233,6 +233,19 @@ List all with: `pixi run list-envs`
 - [Level Loader](docs/level_loader_documentation.md) - Loading official levels (requires game ownership)
 - [Level Format](docs/level_format_analysis.md) - Official .l file format reference
 
+## Known Limitations
+
+The game engine has some unimplemented edge cases. These don't affect basic gameplay but may matter for rigorous evaluation:
+
+| Issue | Impact | Tracking |
+|-------|--------|----------|
+| SINK doesn't trigger lose | Moving YOU into SINK destroys both but doesn't end game | workshop-0yf1ei9l |
+| Transformation doesn't trigger lose | If all YOU objects transform away, game continues | workshop-83jd5lqq |
+| Text objects can be transformed | ROCK IS BABA incorrectly transforms ROCK text | workshop-8s4i3e3n |
+| Rule-breaking doesn't trigger lose | Pushing text to break BABA IS YOU doesn't cause loss | workshop-83jd5lqq |
+
+**Safe environments for evaluation**: `simple`, `wall_maze`, `push_puzzle`, `make_win`, `two_room`, `you_win` - these don't rely on the above mechanics.
+
 ## Copyright Notice
 
 **Baba Is You** is a game by Arvi "Hempuli" Teikari. This project is an independent implementation for AI research purposes.
